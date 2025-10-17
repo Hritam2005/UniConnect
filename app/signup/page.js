@@ -13,6 +13,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "student", // default role
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -47,7 +48,7 @@ export default function SignupPage() {
         id: Math.random(),
         name: formData.name,
         email: formData.email,
-        role: "student",
+        role: formData.role, // store selected role
         registeredEvents: [],
       }
 
@@ -125,6 +126,21 @@ export default function SignupPage() {
                   className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="••••••••"
                 />
+              </div>
+
+              {/* Role Selection Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Select Role</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="student">Student</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
 
               <button
