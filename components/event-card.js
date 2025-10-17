@@ -22,9 +22,12 @@ export default function EventCard({ event, isLive }) {
     minute: "2-digit",
   })
 
-  const cardClassName = isLive
-    ? `rounded-xl border overflow-hidden transition-all hover:shadow-lg border-red-500 bg-gradient-to-r from-red-50 to-orange-50 ${pulse ? "shadow-lg shadow-red-200" : "shadow-md"}`
-    : "rounded-xl border overflow-hidden transition-all hover:shadow-lg border-border bg-card hover:border-primary/50"
+  const baseClasses = "rounded-xl border overflow-hidden transition-all hover:shadow-lg bg-card"
+  const liveClasses = "border-red-500 bg-gradient-to-r from-red-50 to-orange-50"
+  const normalClasses = "border-border hover:border-primary/50"
+  const shadowClasses = isLive && pulse ? "shadow-lg shadow-red-200" : "shadow-md"
+
+  const cardClassName = isLive ? `${baseClasses} ${liveClasses} ${shadowClasses}` : `${baseClasses} ${normalClasses}`
 
   return (
     <div className={cardClassName}>
@@ -54,6 +57,7 @@ export default function EventCard({ event, isLive }) {
                 </svg>
                 <span className="text-foreground">{formattedDate}</span>
               </div>
+
               <div className="flex items-center gap-2 text-sm">
                 <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -80,25 +84,31 @@ export default function EventCard({ event, isLive }) {
                     key={i}
                     className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xs font-bold border-2 border-white"
                   >
-                    {i + 1}
+                    {String.fromCharCode(65 + i)}
                   </div>
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">{event.attendees || 0} attending</span>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <button
-              className={`px-4 py-2 rounded-lg hover:shadow-lg transition-all font-medium ${
-                isLive ? "bg-red-500 text-white hover:bg-red-600" : "bg-gradient-to-r from-primary to-accent text-white"
-              }`}
-            >
-              {isLive ? "Join Now" : "Register"}
-            </button>
-            <button className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
-              Details
-            </button>
+            <div className="flex flex-col gap-2">
+              {isLive ? (
+                <button
+                  className={`px-4 py-2 rounded-lg hover:shadow-lg transition-all font-medium bg-red-500 text-white hover:bg-red-600`}
+                >
+                  Join Live Event
+                </button>
+              ) : (
+                <button
+                  className={`px-4 py-2 rounded-lg hover:shadow-lg transition-all font-medium bg-gradient-to-r from-primary to-accent text-white hover:shadow-lg`}
+                >
+                  Register Now
+                </button>
+              )}
+              <button className="px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
+                Learn More
+              </button>
+            </div>
           </div>
         </div>
       </div>
