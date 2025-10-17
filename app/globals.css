@@ -151,7 +151,6 @@
   animation: slide-in 0.3s ease-out;
 }
 
-/* Added smooth fade-in animation for page transitions */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -165,7 +164,6 @@
   animation: fade-in 0.5s ease-out;
 }
 
-/* Added scale animation for card hover effects */
 @keyframes scale-in {
   from {
     opacity: 0;
@@ -181,10 +179,9 @@
   animation: scale-in 0.3s ease-out;
 }
 
-/* Added smooth transitions for interactive elements */
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg hover:shadow-lg transition-all font-medium;
+    @apply px-4 py-2 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg hover:shadow-lg transition-all font-medium;
   }
 
   .btn-secondary {
