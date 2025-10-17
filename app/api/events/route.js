@@ -1,73 +1,56 @@
-export async function GET() {
-  const events = [
-    {
-      id: 1,
-      title: "Annual Tech Summit 2024",
-      description:
-        "Join us for the biggest tech conference of the year featuring keynote speakers from leading tech companies.",
-      date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Main Auditorium",
-      attendees: 245,
-      status: "upcoming",
-    },
-    {
-      id: 2,
-      title: "Live Coding Workshop",
-      description: "Real-time coding session with industry experts. Learn best practices and advanced techniques.",
-      date: new Date().toISOString(),
-      location: "Lab 101",
-      attendees: 89,
-      status: "live",
-    },
-    {
-      id: 3,
-      title: "AI & Machine Learning Seminar",
-      description: "Explore the latest advancements in AI and ML with hands-on demonstrations.",
-      date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Conference Hall B",
-      attendees: 156,
-      status: "upcoming",
-    },
-    {
-      id: 4,
-      title: "Web Development Bootcamp",
-      description: "Intensive bootcamp covering modern web development frameworks and tools.",
-      date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Computer Lab",
-      attendees: 78,
-      status: "upcoming",
-    },
-    {
-      id: 5,
-      title: "Spring Fest 2024",
-      description: "Annual college festival with music, food, and entertainment.",
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Campus Grounds",
-      attendees: 1200,
-      status: "completed",
-    },
-    {
-      id: 6,
-      title: "Startup Pitch Competition",
-      description: "Showcase your innovative ideas and compete for funding opportunities.",
-      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      location: "Innovation Hub",
-      attendees: 340,
-      status: "completed",
-    },
-  ]
+import { NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 
-  return Response.json(events)
+const DATA_DIR = path.join(process.cwd(), "data");
+const FILE = path.join(DATA_DIR, "events.json");
+
+async function ensureFile() {
+  try {
+    await fs.access(FILE);
+  } catch {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(FILE, "[]", "utf8");
+  }
+}
+
+export async function GET() {
+  await ensureFile();
+  const raw = await fs.readFile(FILE, "utf8");
+  let events = [];
+  try { events = JSON.parse(raw) } catch (e) { events = [] }
+  return NextResponse.json(events);
 }
 
 export async function POST(request) {
-  const body = await request.json()
-
-  const newEvent = {
-    id: Math.random(),
-    ...body,
-    status: "upcoming",
+  await ensureFile();
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  return Response.json(newEvent, { status: 201 })
+  if (!body.title) {
+    return NextResponse.json({ error: "title required" }, { status: 400 })
+  }
+
+  const raw = await fs.readFile(FILE, "utf8");
+  let events = [];
+  try { events = JSON.parse(raw) } catch (e) { events = [] }
+
+  const id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())
+  const newEvent = {
+    id,
+    title: body.title,
+    date: body.date || null,
+    description: body.description || "",
+    createdAt: new Date().toISOString(),
+    ...body,
+  }
+
+  events.push(newEvent)
+  await fs.writeFile(FILE, JSON.stringify(events, null, 2), "utf8")
+
+  return NextResponse.json(newEvent, { status: 201 })
 }

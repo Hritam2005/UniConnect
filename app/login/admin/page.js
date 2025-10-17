@@ -12,6 +12,7 @@ export default function AdminLoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    role: "admin", // Default role
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -33,19 +34,19 @@ export default function AdminLoginPage() {
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, role: "admin" }),
+        body: JSON.stringify(formData),
       })
 
-      if (response.ok) {
-        const user = await response.json()
-        login(user)
-        router.push("/moderator")
-      } else {
+      if (!response.ok) {
         const data = await response.json()
-        setError(data.error || "Invalid credentials")
+        throw new Error(data.error)
       }
+
+      const user = await response.json()
+      login(user) // Assuming login updates the user state
+      router.push("/dashboard") // Redirect to the appropriate page
     } catch (err) {
-      setError("Login failed. Please try again.")
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -100,6 +101,20 @@ export default function AdminLoginPage() {
                   className="input-field"
                   placeholder="••••••••"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Role</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="student">Student</option>
+                </select>
               </div>
 
               <button

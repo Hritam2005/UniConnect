@@ -1,8 +1,10 @@
-export async function POST(request) {
-  const { email, password } = await request.json()
+let nextId = 4; // Start from the next ID after the mock users
 
-  if (!email || !password) {
-    return Response.json({ error: "Email and password are required" }, { status: 400 })
+export async function POST(request) {
+  const { email, password, role } = await request.json();
+
+  if (!email || !password || !role) {
+    return Response.json({ error: "Email, password, and role are required" }, { status: 400 });
   }
 
   // Mock user database
@@ -33,10 +35,16 @@ export async function POST(request) {
     },
   ]
 
-  const user = mockUsers.find((u) => u.email === email && u.password === password)
+  // Check if user exists based on email, password, and role
+  const user = mockUsers.find((u) => u.email === email && u.password === password && u.role === role);
 
   if (!user) {
-    return Response.json({ error: "Invalid email or password" }, { status: 401 })
+    return Response.json({ error: "Invalid email, password, or role" }, { status: 401 });
+  }
+
+  // If user is valid, create a new user ID if necessary
+  if (!user.id) {
+    user.id = nextId++;
   }
 
   // Return user without password

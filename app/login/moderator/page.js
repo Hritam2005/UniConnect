@@ -51,6 +51,16 @@ export default function ModeratorLoginPage() {
     }
   }
 
+  async function createEvent(data) {
+    const res = await fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) throw new Error("Create failed")
+    return res.json()
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <Header />
